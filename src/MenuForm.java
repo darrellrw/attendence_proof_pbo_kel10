@@ -138,7 +138,7 @@ public class MenuForm implements ActionListener {
                     this.passPilih = (String)joPane.showInputDialog(null, "Password:", timeSQL.getMataKuliahYangAda(), JOptionPane.QUESTION_MESSAGE);
                     if(this.passPilih.equals(passKelas.getPasswordKelas())){
                         this.abPilih = (String)joPane.showInputDialog(null, "Keterangan:", "Absensi", JOptionPane.QUESTION_MESSAGE, null, absenKet, absenKet[0]);
-                        DatabaseUserAbsen userAbsen = new DatabaseUserAbsen(this.abPilih, timeSQL.getWaktudariSQLAktif());
+                        DatabaseUserAbsen userAbsen = new DatabaseUserAbsen(this.abPilih, timeSQL.getWaktudariSQLAktif(), userids);
                         frame.dispose();
                         if(this.abPilih.equals("Hadir")) {
                             PointSystem ps = new PointSystem(userids);
