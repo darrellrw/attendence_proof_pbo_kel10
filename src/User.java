@@ -1,10 +1,10 @@
-public class Manusia {
+public class User {
     private String nama;
     private String nim;
     private char kelas;
     private int point;
 
-    public Manusia(String nim, String password) {
+    public User(String nim, String password) {
         DatabaseUser dbUser = new DatabaseUser(nim, password);
         this.nama = dbUser.getNamaUser();
         this.nim = dbUser.getNIMUser();

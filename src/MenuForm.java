@@ -38,7 +38,7 @@ public class MenuForm implements ActionListener {
     JLabel lblStat = new JLabel();
 
     public MenuForm(String userid, String password) {
-        Manusia man = new Manusia(userid, password);
+        User man = new User(userid, password);
         DatabaseAbsen absenDB = new DatabaseAbsen();
         DatabaseTabelAbsen sabsenDB = new DatabaseTabelAbsen(userid);
         CourseType tipeKelas = new CourseType(man.getKelas());
