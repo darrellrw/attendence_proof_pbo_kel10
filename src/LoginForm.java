@@ -13,7 +13,7 @@ public class LoginForm implements ActionListener{
     JPasswordField txtboxPass = new JPasswordField();
     JButton btnLogin = new JButton("Login");
     JButton btnReset = new JButton("Reset");
-    JLabel lblVer = new JLabel("Ver: 0.0.0.6 - 07/06/2022");
+    JLabel lblVer = new JLabel("Ver: 0.0.0.7 - 16/06/2022");
     JLabel lblStatus = new JLabel();
     JLabel lblJudul = new JLabel("Attendance Proof");
     JLabel lblKet = new JLabel("Please insert your Username and Password!");
@@ -84,8 +84,6 @@ public class LoginForm implements ActionListener{
             if(dbUser.getLoginDB() == true) {
                 lblStatus.setForeground(Color.green);
                 lblStatus.setText("Login Successful");
-
-                MenuForm menu = new MenuForm(userid, password);
 
                 frame.dispose();
             }

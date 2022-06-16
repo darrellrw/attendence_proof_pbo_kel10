@@ -34,21 +34,24 @@ public class MenuForm implements ActionListener {
     DefaultTableModel tblAbsensiModel = new DefaultTableModel();
     JTable tblAbsensi = new JTable(tblAbsensiModel);
     JScrollPane jsPane = new JScrollPane(tblAbsensi);
-
     JOptionPane joPane = new JOptionPane();
+    JLabel lblStat = new JLabel();
 
     public MenuForm(String userid, String password) {
-        DatabaseUser userDB = new DatabaseUser(userid, password);
+        Manusia man = new Manusia(userid, password);
         DatabaseAbsen absenDB = new DatabaseAbsen();
         DatabaseTabelAbsen sabsenDB = new DatabaseTabelAbsen(userid);
-        CourseType tipeKelas = new CourseType(userDB.getKelasUser());
+        CourseType tipeKelas = new CourseType(man.getKelas());
 
         this.kelas = tipeKelas.getListCourse();
-        this.noKelas = userDB.getKelasUser();
+        this.noKelas = man.getKelas();
         this.userids = userid;
         this.passwords = password;
 
-        this.points = userDB.getPointUser();
+        this.points = man.getPoint();
+
+        lblStat.setBounds(20, 45, 500, 30);
+        lblStat.setFont(new Font("Tw Cen MT", 0, 18));
 
         btnLogout.setBounds(874, 50, 125, 30);
         btnLogout.addActionListener(this);
@@ -71,16 +74,20 @@ public class MenuForm implements ActionListener {
 
         if(userid.equals("admin")) {
             this.dataTabel = absenDB.getDataTableKelas();
+            Dosen ds = new Dosen(userid, password, "High Permission");
             frame.add(btnAddAbsen);
-            tblAbsensiModel.setColumnIdentifiers(new String[]{"No", "Mata Kuliah", "Kelas", "Password", "Waktu"});
+            tblAbsensiModel.setColumnIdentifiers(ds.getHeader());
             for(int i = 0; i < dataTabel.size(); i++) {
                 tblAbsensiModel.addRow(dataTabel.get(i));
             }
+            lblStat.setText("Status: " + ds.getKeterangan());
+            frame.add(lblStat);
         }
-        else{
+        else {
             this.dataTabel = sabsenDB.getDataTableKelas();
+            Mahasiswa mhs = new Mahasiswa(userid, password);
             frame.add(btnSetAbsen);
-            tblAbsensiModel.setColumnIdentifiers(new String[]{"No", "Mata Kuliah", "Kelas", "Waktu", "Keterangan"});
+            tblAbsensiModel.setColumnIdentifiers(mhs.getHeader());
             for(int i = 0; i < dataTabel.size(); i++) {
                 tblAbsensiModel.addRow(dataTabel.get(i));
             }
@@ -88,7 +95,7 @@ public class MenuForm implements ActionListener {
         }
 
         lblUser.setBounds(20, 5, 500, 30);
-        lblUser.setText("Selamat Datang, " + userDB.getNamaUser());
+        lblUser.setText("Selamat Datang, " + man.getNama());
         lblUser.setFont(new Font("Tw Cen MT", 0, 18));
         frame.add(lblUser);
 
@@ -110,7 +117,7 @@ public class MenuForm implements ActionListener {
         frame.add(jsPane);
 
         frame.getContentPane().setBackground(new Color(0, 153, 153));
-        frame.setTitle("Attendence Proof: " + userDB.getNIMUser());
+        frame.setTitle("Attendence Proof: " + man.getNIM());
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setResizable(false);
         frame.setSize(1024, 480);
@@ -121,33 +128,33 @@ public class MenuForm implements ActionListener {
     @Override
     public void actionPerformed(ActionEvent ae) {
         if(ae.getSource() == btnAddAbsen) {
-            this.mkPilih = (String)joPane.showInputDialog(null, "Tambah Absen Kelas:", "Tambah Absen", JOptionPane.QUESTION_MESSAGE, null, kelas, kelas[0]);
-            DatabaseAddAbsen anb = new DatabaseAddAbsen(this.mkPilih, this.noKelas);
+            this.mkPilih = (String)JOptionPane.showInputDialog(null, "Tambah Absen Kelas:", "Tambah Absen", JOptionPane.QUESTION_MESSAGE, null, kelas, kelas[0]);
+            new DatabaseAddAbsen(this.mkPilih, this.noKelas);
             frame.dispose();
-            MenuForm mf = new MenuForm(userids, passwords);
+            new MenuForm(userids, passwords);
         }
         if(ae.getSource() == btnLogout) {
             frame.dispose();
-            LoginForm login = new LoginForm();
+            new LoginForm();
         }
         if(ae.getSource() == btnSetAbsen) {
             DatabaseTime timeSQL = new DatabaseTime(userids, new Timestamp(System.currentTimeMillis()));
             DatabasePass passKelas = new DatabasePass(timeSQL.getWaktudariSQLAktif());
             if(timeSQL.getConnectionDB() == true && passKelas.getSudahAbsenDB() == false) {
                 try{
-                    this.passPilih = (String)joPane.showInputDialog(null, "Password:", timeSQL.getMataKuliahYangAda(), JOptionPane.QUESTION_MESSAGE);
+                    this.passPilih = (String)JOptionPane.showInputDialog(null, "Password:", timeSQL.getMataKuliahYangAda(), JOptionPane.QUESTION_MESSAGE);
                     if(this.passPilih.equals(passKelas.getPasswordKelas())){
-                        this.abPilih = (String)joPane.showInputDialog(null, "Keterangan:", "Absensi", JOptionPane.QUESTION_MESSAGE, null, absenKet, absenKet[0]);
-                        DatabaseUserAbsen userAbsen = new DatabaseUserAbsen(this.abPilih, timeSQL.getWaktudariSQLAktif(), userids);
+                        this.abPilih = (String)JOptionPane.showInputDialog(null, "Keterangan:", "Absensi", JOptionPane.QUESTION_MESSAGE, null, absenKet, absenKet[0]);
+                        new DatabaseUserAbsen(this.abPilih, timeSQL.getWaktudariSQLAktif(), userids);
                         frame.dispose();
                         if(this.abPilih.equals("Hadir")) {
-                            PointSystem ps = new PointSystem(userids);
+                            new PointSystem(userids);
                         }
-                        MenuForm mf = new MenuForm(userids, passwords);
+                        new MenuForm(userids, passwords);
                     }
                     else {
                         System.out.println("Wrong");
-                        joPane.showMessageDialog(null, "Wrong Password");
+                        JOptionPane.showMessageDialog(null, "Wrong Password");
                     }
                 }
                 catch(Exception e) {
@@ -156,7 +163,7 @@ public class MenuForm implements ActionListener {
             }
             else {
                 System.out.println("Tidak ada jadwal");
-                joPane.showMessageDialog(null, "Tidak ada jadwal yang tersedia");
+                JOptionPane.showMessageDialog(null, "Tidak ada jadwal yang tersedia");
             }
         }
     }
