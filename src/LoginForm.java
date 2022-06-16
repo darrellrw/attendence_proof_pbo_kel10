@@ -85,6 +85,8 @@ public class LoginForm implements ActionListener{
                 lblStatus.setForeground(Color.green);
                 lblStatus.setText("Login Successful");
 
+                new MenuForm(userid, password);
+
                 frame.dispose();
             }
             else if(dbUser.getConnectionDB() == true) {
