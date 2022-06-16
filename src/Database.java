@@ -19,6 +19,8 @@ public class Database {
 
     private String keteranganUser;
 
+    private Timestamp waktuSekarang;
+
     public void DatabaseUserPass(String nim, String password) {
         try {
             Class.forName("com.mysql.jdbc.Driver");
@@ -43,7 +45,7 @@ public class Database {
         }
     }
 
-    public void DatabaseAbsenAdmin() {
+    public void DatabaseTabelAdmin() {
         try {
             Class.forName("com.mysql.jdbc.Driver");
             Connection conDB = DriverManager.getConnection("jdbc:mysql://localhost:3306/tubesk10pboa", "root", "");
@@ -64,7 +66,7 @@ public class Database {
         }
     }
 
-    public void DatabaseAbsenUser(String nim) {
+    public void DatabaseTabelUser(String nim) {
         try {
             Class.forName("com.mysql.jdbc.Driver");
             Connection conDB = DriverManager.getConnection("jdbc:mysql://localhost:3306/tubesk10pboa", "root", "");
@@ -86,10 +88,45 @@ public class Database {
     }
     public void DatabaseTambahAbsen(String mataKuliah, char kelas) {
         try {
+            Kelas tipeKelas = new Kelas(kelas);
+            tipeKelas.setKelasMataKuliah(mataKuliah);
 
+            String sqlDataKelas = "INSERT INTO kelasdata (matakuliah, kelas, passwordkelas, waktu) VALUES (?, ?, ?, ?)";
+            String sqlKet = "INSERT INTO absendata (nim, matakuliah, kelas, waktu, keterangan) VALUES (?, ?, ?, ?, ?)";
+            String sqlNIM = "SELECT * FROM logindata";
+
+            this.waktuSekarang = new Timestamp(System.currentTimeMillis());
+
+            Class.forName("com.mysql.jdbc.Driver");
+            Connection conDB = DriverManager.getConnection("jdbc:mysql://localhost:3306/tubesk10pboa", "root", "");
+            PreparedStatement pstmDKDB = conDB.prepareStatement(sqlDataKelas);
+            PreparedStatement pstmKDB = conDB.prepareStatement(sqlKet);
+
+            Statement stmDB = conDB.createStatement();
+            ResultSet rsDB = stmDB.executeQuery(sqlNIM);
+            
+            pstmDKDB.setString(1, mataKuliah);
+            pstmDKDB.setString(2, String.valueOf(tipeKelas.getKelasMataKuliah()));
+            pstmDKDB.setString(3, passRandom());
+            pstmDKDB.setTimestamp(4, this.waktuSekarang);
+            pstmDKDB.execute();
+
+            while(rsDB.next()) {
+                if(rsDB.getString("classtype").equals(String.valueOf(tipeKelas.getKelasMataKuliah()))) {
+                    pstmKDB.setString(1, rsDB.getString("nim"));
+                    pstmKDB.setString(2, mataKuliah);
+                    pstmKDB.setString(3, String.valueOf(tipeKelas.getKelasMataKuliah()));
+                    pstmKDB.setTimestamp(4, this.waktuSekarang);
+                    pstmKDB.setString(5, "Belum");
+                    
+                    pstmKDB.execute();
+                }
+            }
+
+            conDB.close();
         }
         catch(Exception e) {
-            
+            System.out.println(e);
         }
     }
 
@@ -115,5 +152,16 @@ public class Database {
 
     public ArrayList<Object[]> getDataTabelKelas() {
         return this.dataTabel;
+    }
+
+    public String passRandom() {
+        int len = 8;
+        String chars = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz!@#$%&";
+        Random rnd = new Random();
+		StringBuilder sb = new StringBuilder(len);
+		for (int i = 0; i < len; i++)
+			sb.append(chars.charAt(rnd.nextInt(chars.length())));
+        System.out.println(sb.toString());
+        return sb.toString();
     }
 }
